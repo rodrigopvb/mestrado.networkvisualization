@@ -1,0 +1,113 @@
+source("LibVisualizationNetworks.gua")
+
+startAngle = 0.0;
+endAngle = PI * 2;
+radiusXaxisMax = ((getWidthArea() / 2)* 0.1)*10;
+radiusYaxisMax = ((getHeightArea() / 2) * 0.1)*10;
+adjustMaxBorder = 5.0;
+degreeMax = 0;
+
+posX = {0};
+posY = {0};
+
+
+function calculateDegree(vertex){
+    degree = 0;
+    xe = getPositionsEdgesAxisX();
+    for (i = 0; i < length(xe); i = i + 2){
+        if(xe[i] == vertex){
+            degree = degree + 1;
+        }elseif(xe[i+1] == vertex){
+            degree = degree + 1;
+        }
+    }
+    if($degreeMax < degree){
+        $degreeMax = degree;
+    }
+    return(degree);
+}
+
+function getSmallestRadius(){
+    if(currentDegree == 0){
+        currentRadiusXaxis = $radiusXaxisMax / (1);
+        currentRadiusYaxis = $radiusYaxisMax / (1);
+        if(currentRadiusXaxis < currentRadiusYaxis){
+            smallestRadius = currentRadiusXaxis;
+        }else{
+            smallestRadius = currentRadiusYaxis;
+        }
+    }elseif(currentDegree == 1){
+        currentRadiusXaxis = $radiusXaxisMax / (currentDegree + 0.150);
+        currentRadiusYaxis = $radiusYaxisMax / (currentDegree + 0.150);
+        if(currentRadiusXaxis < currentRadiusYaxis){
+            smallestRadius = currentRadiusXaxis;
+        }else{
+            smallestRadius = currentRadiusYaxis;
+        }
+    }else{
+        currentRadiusXaxis = $radiusXaxisMax / (currentDegree - 0.500);
+        currentRadiusYaxis = $radiusYaxisMax / (currentDegree - 0.500);
+        if(currentRadiusXaxis < currentRadiusYaxis){
+            smallestRadius = currentRadiusXaxis;
+        }else{
+            smallestRadius = currentRadiusYaxis;
+        }
+
+    }
+    return(smallestRadius)
+}
+
+
+function calculeAmountDegreeVertex(arrayDegreVertex, degree){
+    amountVertex = 0;
+    for(i = 0; i < length(arrayDegreVertex); i=i+1){
+        if(arrayDegreVertex[i] == degree){
+            amountVertex = amountVertex + 1;
+        }
+    }
+    return(amountVertex);
+}
+
+function calculatePositionKCore(){
+    amountVertices = getLengthXv();
+    
+    for(i = 0; i < amountVertices; i=i+1){
+        degreeVertex[i] = calculateDegree(i);
+    }
+    
+    println("Quantidade de Vértices: "+ amountVertices);
+    println("Grau máximo: "+ $degreeMax+"\n");
+    
+    for(i = 0; i <= $degreeMax; i=i+1){
+        currentDegree = i;
+        amountDegreeVertex = calculeAmountDegreeVertex(degreeVertex, currentDegree);
+    
+        if(amountDegreeVertex == 1){
+            offset = ((endAngle - startAngle)/(amountDegreeVertex));
+        }elseif(amountDegreeVertex > 1){
+            offset = ((endAngle - startAngle)/(amountDegreeVertex - 1));
+        }else{
+            offset = ((endAngle - startAngle)/(1));
+        }
+        diferenceAmountDegreeVertex = 0;
+        
+        println("Grau atual: " + currentDegree);
+        println("Quantidade de vertices com grau "+ currentDegree + " Total: "+ amountDegreeVertex);
+        println("Valor de offset em radiano: "+ offset+ "\n");
+
+    for (j = 0; j < getLengthXv(); j = j + 1){
+        smallestRadius = getSmallestRadius();
+        
+            if((degreeVertex[j] == currentDegree)){
+                diferenceAmountDegreeVertex = diferenceAmountDegreeVertex + 1;
+                angle = (diferenceAmountDegreeVertex * offset);
+                $posX[j] = ($radiusXaxisMax + ((smallestRadius - adjustMaxBorder) *cos($startAngle + angle))) / getWidthArea();
+                $posY[j] = ($radiusYaxisMax + ((smallestRadius - adjustMaxBorder) *sin($startAngle + angle))) / getHeightArea();
+
+            }
+        }
+    }
+    setPositionVerticesAxisX($posX);
+    setPositionVerticesAxisY($posY);
+}
+

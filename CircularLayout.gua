@@ -1,0 +1,36 @@
+source("LibVisualizationNetworks.gua")
+
+startAngle = 0.0;
+endAngle = PI * 2;
+radiusXaxis = ((getWidthArea() / 2)* 0.1)*10;
+radiusYaxis = ((getHeightArea() / 2) * 0.1)*10;
+adjustMaxBorder = 5.0;
+
+posX = {0};
+posY = {0};
+
+function calculatePosition(){
+    amountVertices = getLengthXv();
+    
+    offset = ((endAngle - startAngle)/(amountVertices - 1));
+    if($radiusXaxis < $radiusYaxis){
+        smallestRadius = $radiusXaxis;
+    }else{
+        smallestRadius = $radiusYaxis;
+    }
+    
+    println("Quantidade de Vértices: "+ amountVertices);
+    println("Valor do offset em radiano: "+ offset);
+    println("Valor do menor raio: " + smallestRadius);
+    
+    for (i = 0; i < getLengthXv(); i = i + 1){
+        angle = (i * offset);
+
+        $posX[i] = convertValueNormalized(($radiusXaxis + ((smallestRadius - adjustMaxBorder) *cos($startAngle + angle))) / getWidthArea());
+        $posY[i] = convertValueNormalized(($radiusYaxis + ((smallestRadius - adjustMaxBorder) *sin($startAngle + angle))) / getHeightArea());
+    }
+    setPositionVerticesAxisX($posX);
+    setPositionVerticesAxisY($posY);
+    printf(arrayToString($posX)+"\n\n")
+    printf(arrayToString($posY)+"\n\n")
+}

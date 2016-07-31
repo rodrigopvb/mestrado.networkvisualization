@@ -1,0 +1,33 @@
+source("LibVisualizationNetworks.gua")
+
+posXv = {0};
+posYv = {0};
+
+function initRandom(){
+    amountVertices =  getLengthXv();
+    println("Quantidade de Vértices: "+ amountVertices);
+    for (i = 0; i < amountVertices; i = i + 1){
+    condition = 0;
+    randomValueX =0;
+    randomValueY =0;
+        while(condition == 0){
+            randomValueX = randomPosition();
+            if((randomValueX < 0.850) && (randomValueX > 0.150)){
+                condition = 1;
+            }
+        }
+        condition = 0;
+        while(condition == 0){
+            randomValueY = randomPosition();
+            if((randomValueY < 0.850) && (randomValueY > 0.150)){
+                condition = 1;
+            }
+        }
+        randomValueNormalizedX = convertValueNormalized(randomValueX);
+        randomValueNormalizedY = convertValueNormalized(randomValueY);
+        $posXv[i] = randomValueNormalizedX;
+        $posYv[i] = randomValueNormalizedY;
+    }
+setPositionVerticesAxisX($posXv);
+setPositionVerticesAxisY($posYv);
+}

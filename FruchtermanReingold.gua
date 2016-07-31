@@ -1,0 +1,198 @@
+AREA_MULTIPLICATOR    = 0.001;
+speed                 = 1.0;
+amountVertex          = 0;
+k                     = 0;
+gravity               = 10;
+speed_divisor         = 2.0;
+inverse_temperature   = 0;
+temperature_increment = 0.2;
+
+
+posXv = {0};
+posYv = {0};
+
+forceDirectionY = {0};
+forceDirectionX = {0};
+
+edgesXe = {0};
+
+function getFruchtermanReingoldAttractionForce(distance){
+    quadDistance = distance * distance;
+    result = quadDistance / $k;
+    return(result);
+}
+
+function getFruchtermanReingoldRepulsionForce(distance){
+    quadK = $k * $k;
+    result = quadK / distance;
+    return(result);
+}
+
+function initFruchtermanReingoldForceVector(){
+    for (i = 0; i < $amountVertex; i = i + 1){
+        $forceDirectionX[i] = 0;
+        $forceDirectionY[i] = 0;
+    }
+}
+
+function initialPositions(){
+
+    for (i = 0; i < getLengthXv(); i = i + 1){
+        condition    = 0;
+        randomValueX = 0;
+        randomValueY = 0;
+            while(condition == 0){
+                randomValueX = randomPosition();
+                if((randomValueX < 0.550) && (randomValueX > 0.450)){
+                    condition = 1;
+                }
+            }
+            condition = 0;
+            while(condition == 0){
+                randomValueY = randomPosition();
+                if((randomValueY < 0.550) && (randomValueY > 0.450)){
+                    condition = 1;
+                }
+            }
+            $posXv[i] = convertValueNormalized(randomValueX);
+            $posYv[i] = convertValueNormalized(randomValueY);
+    }
+
+    println("Valores do array posXv: " + arrayToString($posXv));
+    println("Valores do array posYv: " + arrayToString($posYv));
+    setPositionVerticesAxisX($posXv);
+    setPositionVerticesAxisY($posYv);
+}
+
+function updateFruchtermanReingoldPosition(){
+    #updatePosition
+    for(i = 0; i < amountVertex; i = i + 1){
+        displacementX = $forceDirectionX[i];
+        displacementY = $forceDirectionY[i];
+        d = sqrt(displacementX * displacementX + displacementY * displacementY);
+        
+        if(d > 0){
+            maxDisplace = getFruchtermanReingoldMaxDisplace();
+            limitedDist =  maxDisplace * ($speed / $speed_divisor);
+            if(limitedDist < d){
+                $posXv[i] = convertValueNormalized($posXv[i] + displacementX / d * limitedDist);
+                $posYv[i] = convertValueNormalized($posYv[i] + displacementY / d * limitedDist);
+                
+            }else{
+                limitedDist = d;
+                $posXv[i] = convertValueNormalized($posXv[i] + displacementX / d * limitedDist);
+                $posYv[i] = convertValueNormalized($posYv[i] + displacementY / d * limitedDist);
+            }
+        }
+    }
+    setPositionVerticesAxisX($posXv);
+    setPositionVerticesAxisY($posYv);
+}
+
+function calculateFruchtermanReingoldRepulsionForce(){
+    #repulsionForce
+    for (i = 0; i < $amountVertex; i = i + 1){
+        dxCurrentVertex = $posXv[i];
+        dyCurrentVertex = $posYv[i];
+        for (j = 0; j < $amountVertex; j = j + 1){
+            if(i != j){
+                displacementDifferenceX = dxCurrentVertex - $posXv[j];
+                displacementDifferenceY = dyCurrentVertex - $posYv[j];
+                value = displacementDifferenceX * displacementDifferenceX + displacementDifferenceY * displacementDifferenceY;
+
+                if(value!=0) {
+                    d = sqrt(value);
+                }
+                else {
+                    d = 0.001;
+                }
+
+                if(d > 0){
+                    repulseF = getFruchtermanReingoldRepulsionForce(d);
+                    $forceDirectionX[i] = $forceDirectionX[i] + (displacementDifferenceX/d) * repulseF;
+                    $forceDirectionY[i] = $forceDirectionY[i] + (displacementDifferenceY/d) * repulseF;
+                }
+            }
+        }
+    }
+}
+
+function calculateFruchtermanReingoldAttractionForce(){
+    #attractionForce
+    for (i = 0; i < getLengthXe(); i = i + 2){
+        displacementDifferenceX = $posXv[$edgesXe[i]] - $posXv[$edgesXe[i+1]];
+        displacementDifferenceY = $posYv[$edgesXe[i]] - $posYv[$edgesXe[i+1]];
+
+        value = displacementDifferenceX * displacementDifferenceX + displacementDifferenceY * displacementDifferenceY;
+
+        if(value != 0) {
+            d = sqrt(value);
+        }
+        else {
+            d = 0.001;
+        }
+
+        attractiveF = getFruchtermanReingoldAttractionForce(d);
+        if(d > 0){
+            $forceDirectionX[$edgesXe[i]]   = $forceDirectionX[$edgesXe[i]]   - (displacementDifferenceX/d) * attractiveF;
+            $forceDirectionY[$edgesXe[i]]   = $forceDirectionY[$edgesXe[i]]   - (displacementDifferenceY/d) * attractiveF;
+            $forceDirectionX[$edgesXe[i+1]] = $forceDirectionX[$edgesXe[i+1]] + (displacementDifferenceX/d) * attractiveF;
+            $forceDirectionY[$edgesXe[i+1]] = $forceDirectionY[$edgesXe[i+1]] + (displacementDifferenceY/d) * attractiveF;
+        }
+    }
+}
+
+function calculateFruchtermanReingoldGravity(){
+    #gravity
+    for(i = 0; i < $amountVertex; i = i + 1){
+        d = sqrt($posXv[i] * $posXv[i] + $posYv[i] * $posYv[i]);
+        gf = 0.01 * $k * $gravity * d;
+        $forceDirectionX[i] = $forceDirectionX[i] - gf * $posXv[i] / d;
+        $forceDirectionY[i] = $forceDirectionY[i] - gf * $posYv[i] / d;
+    }
+
+}
+function calculateFruchtermanReingoldSpeed(){
+    #speed
+    for(i = 0; i < $amountVertex; i = i + 1){
+        $forceDirectionX[i] = $forceDirectionX[i] * $speed / $speed_divisor;
+        $forceDirectionY[i] = $forceDirectionY[i] * $speed / $speed_divisor;
+    }
+
+}
+function getFruchtermanReingoldArea (){
+    area = getWidthArea() * getHeightArea()/100.0;
+    return(area);
+}
+
+function getFruchtermanReingoldMaxDisplace(){
+    area = getFruchtermanReingoldArea();
+    maxDisplace =  sqrt($AREA_MULTIPLICATOR *area)/($inverse_temperature + 25.0);
+    $inverse_temperature = $inverse_temperature + $temperature_increment; 
+    return(maxDisplace);
+}
+
+function getFruchtermanReingoldK(){
+    area           = getFruchtermanReingoldArea();
+    l_amountVertex = getLengthXv();
+    k              = sqrt($AREA_MULTIPLICATOR *area)/(1.0 + l_amountVertex);
+    return(k);
+} 
+
+function calculateForces(){
+    calculateFruchtermanReingoldRepulsionForce();
+    calculateFruchtermanReingoldAttractionForce();
+    calculateFruchtermanReingoldGravity();
+    calculateFruchtermanReingoldSpeed();
+    updateFruchtermanReingoldPosition();
+}
+
+function initFruchterman(){
+    $edgesXe      = getPositionsEdgesAxisX();
+    $amountVertex = getLengthXv();
+    $k = getFruchtermanReingoldK();
+    
+    initialPositions();
+    initFruchtermanReingoldForceVector();
+    calculateForces();
+}

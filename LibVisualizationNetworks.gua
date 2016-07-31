@@ -1,0 +1,347 @@
+xv = {0};
+yv = {0};
+
+xe = {0};
+ye = {0};
+
+currentSelectedVertex = -1;
+
+validatorSelectedVertex = "false";
+
+fristSelectedVertex = -1;
+secondSelectedVertex = -1;
+
+widthArea = 800;
+heightArea = 600;
+
+function findVertice(valueX, valueY){
+    
+    x = convertPositionAxisInPositionClickMouseX(valueX);
+    y = convertPositionAxisInPositionClickMouseY(valueY);
+    
+    println("Valor Convertido de X: "+ x);
+    println("Valor Convertido de Y: "+ y);
+    
+    for(i=0; i< length($xv); i=i+1){
+        if(x == $xv[i]){
+            if(y == $yv[i]){
+                println("vertice = "+ $xv[1] + "encontrado");
+                return (i);
+            }else{
+                for(j=-0.008; j<0.008; j=j+0.001){
+                    if(y == $yv[i]+j){
+                        println("vertice = "+ $xv[1] + "encontrado");
+                        return (i);
+                    }
+                }
+            }
+            
+        }else{
+            for(j=-0.008; j<0.008; j=j+0.001){
+                if(x == ($xv[i]+j)){
+                println("Achei o x na posição: " + i);
+                    if(y == $yv[i]){
+                        println("vertice = "+ $xv[1] + "encontrado");
+                        return (i);
+                    }else{
+                        for(m=-0.008; m<0.008; m=m+0.001){
+                            if(y == ($yv[i]+m)){
+                                println("vertice = "+ $xv[1] + "encontrado");
+                                return (i);
+                            }
+                        }
+                    
+                    }
+                }
+            }
+        }
+    }
+    
+printf("vertice não encontrado\n");
+
+return (-1);
+
+}
+
+function convertPositionAxisInPositionClickMouseX(x){
+    decimalX = x * 0.001;
+    widthArea = getWidthArea();
+    parcialValue = (decimalX / widthArea);
+    valueOperation = (parcialValue * 1000000);
+    valueOperationFloor = floor(valueOperation);
+    valueX = (valueOperationFloor / 1000.000);
+    
+    return(valueX);
+}
+
+function convertPositionAxisInPositionClickMouseY(y){
+    decimalY = y * 0.001;
+    heightArea = getHeightArea();
+    parcialValue = (decimalY / heightArea);
+    valueOperation = (parcialValue * 1000000);
+    valueOperationFloor = floor(valueOperation);
+    valueY = (valueOperationFloor / 1000.000);
+    
+    return(valueY);
+}
+
+function convertNormalizedValue(valueOperation){
+    valueOperation = valueOperation * 1.000;
+    valueParcial = (valueOperation * 1000000);
+    valueOperationFloor = floor(valueParcial);
+    value = (valueOperationFloor / 1000.000);
+    println("Valor final convertido: "+ value);
+    return(value);
+}
+
+function convertValueNormalized(value){
+    valueParcial = value * 1000.0;
+    valueOperationFloor = floor(valueParcial);
+    finalValue = valueOperationFloor / 1000.00;
+    return(finalValue);
+}
+
+function getPositionsVertexAxisX(){
+    return($xv);
+}
+
+function getPositionsVertexAxisY(){
+    return($yv);
+}
+
+function getPositionsEdgesAxisX(){
+    return($xe);
+}
+
+function getPositionsEdgesAxisY(){
+    return($ye);
+}
+
+function getEspecificPositionVertexAxisX(position){
+    return($xv[position]);
+}
+
+function setEspecificValueInPositionVertexAxisX(position, value){
+    $xv[position] = value;
+}
+
+function getWidthArea(){
+    return($widthArea);
+}
+
+function getHeightArea(){
+    return($heightArea);
+}
+
+function getEspecificPositionVertexAxisY(position){
+    return($yv[position]);
+}
+
+function setEspecificValueInPositionVertexAxisY(position, value){
+    $yv[position] = value;
+}
+
+function getEspecificPositionEdgeAxisX(position){
+    return($xe[position]);
+}
+
+function setEspecificValueInPositionEdgexAxisX(position, value){
+    $xe[position] = value;
+}
+
+function getEspecificPositionEdgeAxisX(position){
+    return($ye[position]);
+}
+
+function setEspecificValueInPositionEdgexAxisY(position, value){
+    $ye[position] = value;
+}
+
+function getCurrentSelectedVertex(){
+    return($currentSelectedVertex);
+}
+
+function setCurrentSelectedVertex(selectedVertex){
+    $currentSelectedVertex = selectedVertex;
+}
+
+function getValidatorSelectedVertex(){
+    return($validatorSelectedVertex);
+}
+
+function setValidatorSelectedVertex(condition){
+    $validatorSelectedVertex = condition;
+}
+
+function setFristSelectedVertex(positionVertex){
+    $fristSelectedVertex = positionVertex;
+}
+
+function getFristSelectedVertex(){
+    return($fristSelectedVertex);
+}
+
+function setSecondSelectedVertex(positionVertex){
+    $secondSelectedVertex = positionVertex;
+}
+
+function getSecondSelectedVertex(){
+    return($secondSelectedVertex);
+}
+
+function addNewEdge(){
+    $xe[length($xe)] = getFristSelectedVertex();
+    $ye[length($ye)] = getFristSelectedVertex();
+    $xe[length($xe)] = getSecondSelectedVertex();
+    $ye[length($ye)] = getSecondSelectedVertex();
+}
+
+function randomPosition(){
+    valueRandom = random();
+    parcialValue = valueRandom * 1000;
+    valueOperationFloor = floor(parcialValue);
+    initialPosition = valueOperationFloor / 1000.000;
+    
+    return(initialPosition);
+}
+
+function setPositionVerticesAxisX(verticesAxisX){
+    $xv = verticesAxisX;
+}
+
+function setPositionVerticesAxisY(verticesAxisY){
+    $yv = verticesAxisY;
+}
+
+function getLengthXe(){
+    return(length($xe));
+}
+
+function getLengthXv(){
+    return(length($xv));
+}
+
+function cnaSaveFile(filename, adj, type = "edges") {
+    dim_adj = dim(adj)
+    dim_i = dim_adj[0]
+    dim_j = dim_adj[1]
+    
+    # Each line in a Pajek files must terminate with CR+LF.
+    # Windows will automaticly converts "\n" to "\r\n", but
+    # Linux will not.
+    if ($SYS_HOST == "linux") {
+        new_line = "\r\n"
+    } else {
+        new_line = "\n"
+    }
+
+    fp = fopen(filename, "w")
+
+    # Save vertices...
+    fputs("*Vertices " + (dim_i - 1) + new_line, fp)
+    for (i = 1; i < dim_i; i = i + 1) {
+        fputs(i + " \"" + adj[i, 0] + "\"" + new_line, fp)
+    }
+
+    # Save edges...
+    if (type == "edges") {
+        fputs("*Edges" + new_line, fp)
+        for (i = 1; i < dim_i; i = i + 1) {
+            for (j = 1; j < dim_j; j = j + 1) {
+                if (adj[i, j] != 0) {
+                    fputs(i + " " + j + " " + adj[i, j] + new_line, fp)
+                }
+            }
+        }
+    # Save arcs...
+    } elseif (type == "arcs") {
+        fputs("*Arcs" + new_line, fp)
+        for (i = 1; i < dim_i; i = i + 1) {
+            for (j = 1; j < dim_j; j = j + 1) {
+                if (adj[i, j] != 0) {
+                    fputs(i + " " + j + " " + adj[i, j] + new_line, fp)
+                }
+            }
+        }
+    # Save matrix...
+    } elseif (type == "matrix") {
+        fputs("*Matrix" + new_line, fp)
+        for (i = 1; i < dim_i; i = i + 1) {
+            for (j = 1; j < dim_j; j = j + 1) {
+                fputs(" " + adj[i, j], fp)
+            }1
+            fputs(new_line, fp)
+        }
+    }
+
+    fp = fclose(fp)
+}
+
+
+function cnaLoadFile(file_name) {
+    fp = fopen(file_name, "r")
+    currentVertice = -1;
+    file_section = "none"
+    x = 0;
+    y = 0;
+
+    while (!feof(fp)) {
+        if((line = fgets(fp)) == NULL) { 
+            break
+        }
+
+        record = split(trim(line, " \t\r\n"))
+
+        if ((tolower(record[0]) == "*vertices") || (tolower(record[0]) == "*edges") || (tolower(record[0]) == "*arcs") || (tolower(record[0]) == "*matrix")) {
+            file_section = tolower(record[0])
+            if (file_section == "*vertices") {
+                lengthVertices = eval(record[1]);
+                for (i = 0; i < lengthVertices; i = i + 1){
+                    $xv[i] = 0;
+                    $yx[i] = 0;
+                }
+            }
+            i = 0
+            continue
+        }
+
+        if (file_section == "*vertices") {
+            adj[0, i + 1] = eval(record[1])
+            adj[i + 1, 0] = eval(record[1])
+            i = i + 1
+        } elseif (file_section == "*edges") {
+            if (length(record) == 2) {
+                if(length($xe) == 1){
+                    $xe[0] = (eval(record[0])) - 1;
+                    $ye[0] = (eval(record[0])) - 1;
+                    $xe[length($xe)] = (eval(record[1])) - 1;
+                    $ye[length($ye)] = (eval(record[1])) - 1;
+                }else{
+                    $xe[length($xe)] = (eval(record[0])) - 1;
+                    $ye[length($ye)] = (eval(record[0])) - 1;
+                    $xe[length($xe)] = (eval(record[1])) - 1;
+                    $ye[length($ye)] = (eval(record[1])) - 1;
+                }
+            }
+        } elseif (file_section == "*arcs") {
+            i = eval(record[0])
+            j = eval(record[1])
+            if (length(record) == 2) {
+                adj[i, j] = 1
+            } else {
+                adj[i, j] = eval(record[2])
+            }
+        } elseif (file_section == "*matrix") {
+            foreach(record; j; v) {
+                adj[i + 1, j + 1] = eval(v)
+                if (i == n) {
+                    break
+                }
+            }
+            i = i + 1
+        }
+    }
+
+    fp = fclose(fp)
+    return(0)
+}

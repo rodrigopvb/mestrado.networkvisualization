@@ -1,0 +1,111 @@
+posXv = {0};
+posYv = {0};
+
+function initRetraction(){
+    amountVertices =  getLengthXv();
+    println("Quantidade de Vértices: "+ amountVertices);
+    for (i = 0; i < getLengthXv(); i = i + 1){
+    condition = 0;
+    randomValueX =0;
+    randomValueY =0;
+        while(condition == 0){
+            randomValueX = randomPosition();
+            if((randomValueX < 0.850) && (randomValueX > 0.150)){
+                condition = 1;
+            }
+        }
+        condition = 0;
+        while(condition == 0){
+            randomValueY = randomPosition();
+            if((randomValueY < 0.850) && (randomValueY > 0.150)){
+                condition = 1;
+            }
+        }
+        
+        $posXv[i] = randomValueX;
+        $posYv[i] = randomValueY;
+    }
+setPositionVerticesAxisX($posXv);
+setPositionVerticesAxisY($posYv);
+
+}
+
+function retraction(){
+    $posXv = getPositionsVertexAxisX();
+    $posYv = getPositionsVertexAxisY();
+    for(i = 0; i< length($posXv); i=i+1){
+        if(($posXv[i] > 0.5) && ($posYv[i]<0.5)){
+            parcialValueX = $posXv[i] / 1.001;
+            if((parcialValueX < 0.995) && (parcialValueX > 0.005)){
+                $posXv[i] = parcialValueX;
+            }elseif(parcialValueX < 0.005){
+                $posXv[i] = 0.005;
+            }elseif(parcialValueX > 0.995){
+                $posXv[i] = 0.995;
+            }
+            parcialValueY = $posYv[i] * 1.001;
+            if((parcialValueY < 0.995) && (parcialValueY > 0.005)){
+                $posYv[i] = parcialValueY;
+            }elseif(parcialValueY < 0.005){
+                $posYv[i] = 0.005;
+            }elseif(parcialValueY > 0.995){
+                $posYv[i] = 0.995;
+            }
+        }elseif(($posXv[i] > 0.5) && ($posYv[i] > 0.5)){
+            parcialValueX = $posXv[i] / 1.001;
+            if((parcialValueX < 0.995) && (parcialValueX > 0.005)){
+                $posXv[i] = parcialValueX;
+            }elseif(parcialValueX < 0.005){
+                $posXv[i] = 0.005;
+            }elseif(parcialValueX > 0.995){
+                $posXv[i] = 0.995;
+            }
+            parcialValueY = $posYv[i] / 1.001;
+            if((parcialValueY < 0.995) && (parcialValueY > 0.005)){
+                $posYv[i] = parcialValueY;
+            }elseif(parcialValueY < 0.005){
+                $posYv[i] = 0.005;
+            }elseif(parcialValueY > 0.995){
+                $posYv[i] = 0.995;
+            }
+        }elseif(($posXv[i] < 0.5) && ($posYv[i] > 0.5)){
+            parcialValueX = $posXv[i] * 1.001;
+            if((parcialValueX < 0.995) && (parcialValueX > 0.005)){
+                $posXv[i] = parcialValueX;
+            }elseif(parcialValueX < 0.005){
+                $posXv[i] = 0.005;
+            }elseif(parcialValueX > 0.995){
+                $posXv[i] = 0.995;
+            }
+            parcialValueY = $posYv[i] / 1.001;
+            if((parcialValueY < 0.995) && (parcialValueY > 0.005)){
+                $posYv[i] = parcialValueY;
+            }elseif(parcialValueY < 0.005){
+                $posYv[i] = 0.005;
+            }elseif(parcialValueY > 0.995){
+                $posYv[i] = 0.995;
+            }
+        }elseif(($posXv[i] < 0.5) && ($posYv[i] < 0.5)){
+            parcialValueX = $posXv[i] * 1.001;
+            if((parcialValueX < 0.995) && (parcialValueX > 0.005)){
+                $posXv[i] = parcialValueX;
+            }elseif(parcialValueX < 0.005){
+                $posXv[i] = 0.005;
+            }elseif(parcialValueX > 0.995){
+                $posXv[i] = 0.995;
+            }
+            parcialValueY = $posYv[i] * 1.001;
+            if((parcialValueY < 0.995) && (parcialValueY > 0.005)){
+                $posYv[i] = parcialValueY;
+            }elseif(parcialValueY < 0.005){
+                $posYv[i] = 0.005;
+            }elseif(parcialValueY > 0.995){
+                $posYv[i] = 0.995;
+            }
+        }
+        parcialValueX = 0;
+        parcialValueY = 0;
+    }
+setPositionVerticesAxisX($posXv);
+setPositionVerticesAxisY($posYv);
+}

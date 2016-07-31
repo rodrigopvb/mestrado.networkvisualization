@@ -1,0 +1,268 @@
+#!/usr/local/bin/glwmguash
+
+source("LibVisualizationNetworks.gua")
+source("CircularLayout.gua")
+source("KcoreLayout.gua")
+source("RandomLayout.gua")
+source("ExpansionLayout.gua")
+source("RetractionLayout.gua")
+source("FruchtermanReingold.gua")
+
+algorithmChosen = -1;
+
+function display(window){
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    
+    widthArea = getWidthArea();
+    heightArea = getHeightArea();
+    
+    glViewport(0, 0, widthArea, heightArea);
+    glOrtho(0.0, 1.0, 1.0, 0.0, 1.0, -1.0);
+    glMatrixMode(GL_MODELVIEW);
+    
+    if($algorithmChosen == 1){
+        execution();
+    }elseif($algorithmChosen == 7){
+        calculateForces();
+    }
+
+    #Obtem posição dos vértices do eixo x e y
+    vertexAxisX = getPositionsVertexAxisX();
+    vertexAxisY = getPositionsVertexAxisY();
+    
+    edgeAxisX = getPositionsEdgesAxisX();
+    edgeAxisY = getPositionsEdgesAxisY();
+
+    #define cor de fundo
+    glClearColor(1.0,1.0,1.0,0.0);
+    #realiza limpeza de cor urrentPositionValue(value);de fundo
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    for(i=0; i<length(edgeAxisX); i=i+2){
+        glBegin(GL_LINES);
+            glColor(0.0, 0.0, 1.0, 1.0);
+            glVertex(vertexAxisX[edgeAxisX[i]], vertexAxisY[edgeAxisY[i]], 0);
+            glVertex(vertexAxisX[edgeAxisX[i+1]], vertexAxisY[edgeAxisY[i+1]], 0);
+        glEnd();
+    }
+    #define tamanho do verice
+    glPointSize(7);
+    for(i=0; i<length(vertexAxisX); i=i+1){
+        glBegin(GL_POINTS);
+            glColor(1.0, 0.0, 0.0, 1.0);
+            glVertex(vertexAxisX[i], vertexAxisY[i], 0);
+        glEnd();
+    }
+    glFlush();
+    
+    #glwmSwapBuffers(window);
+}
+
+function mouseMotion(window, x, y) {
+
+    currentPosition = getCurrentSelectedVertex();
+    if(currentPosition == -1){
+    }else{
+        valueX = convertPositionAxisInPositionClickMouseX(x);
+        valueY = convertPositionAxisInPositionClickMouseY(y);
+        setEspecificValueInPositionVertexAxisX(currentPosition, valueX);
+        setEspecificValueInPositionVertexAxisY(currentPosition, valueY);
+    }
+}
+
+function mouseButtonPress(window, button, state, x, y) {
+    printf("Mouse button press: button = %d, state = %d, x = %d, y = %d\n", button, state, x, y);
+    if(button == 0){
+        returnVertexFound = findVertice(x,y);
+        printf("Retorno funcao" + returnVertexFound)
+        if(returnVertexFound == -1){        
+            printf("vertice não encontrado =%d\n", returnVertexFound);
+        }else{
+            setCurrentSelectedVertex(returnVertexFound);
+            printf("vertice encontrado =%d\n", returnVertexFound);
+        }
+    }elseif(button == 2){
+        returnVertexFound = findVertice(x,y);
+        validator = getValidatorSelectedVertex();        
+        if(returnVertexFound == -1){
+            printf("vertice não encontrado =%d\n", returnVertexFound);
+            setValidatorSelectedVertex("false");
+        }elseif(returnVertexFound != -1 && validator == "false"){
+            setValidatorSelectedVertex("true");
+            setFristSelectedVertex(returnVertexFound);
+            
+            printf("Primeiro ponto da aresta no array temporario =%d\n", returnVertexFound);
+        }elseif(returnVertexFound != -1 && validator == "true"){
+            setValidatorSelectedVertex("false");
+            setSecondSelectedVertex(returnVertexFound);
+
+           addNewEdge();
+
+            printf("Criado nova aresta do vértice=%d ao vértice=%d \n", getFristSelectedVertex(), getSecondSelectedVertex);
+        }else{
+            setValidatorSelectedVertex("false");
+        }
+    }
+}
+
+function mouseButtonRelease(window, button, state, x, y) {
+    printf("Mouse button release: button = %d, state = %d, x = %d, y = %d\n", button, state, x, y);
+     currentPosition = getCurrentSelectedVertex();
+     if(currentPosition == -1){
+        printf("Nada a modificar no array\n");
+    }else{
+        valueX = convertPositionAxisInPositionClickMouseX(x);
+        valueY = convertPositionAxisInPositionClickMouseY(y);
+        setEspecificValueInPositionVertexAxisX(getCurrentSelectedVertex(), valueX);
+        setEspecificValueInPositionVertexAxisY(getCurrentSelectedVertex(), valueY);
+        setCurrentSelectedVertex(-1);
+    }
+}
+
+function keyPress(window, key, x, y) {
+    printf("Key press: key = %d, x = %d, y = %d\n", key, x, y);
+    if (key == 27) {
+        glwmExitMainLoop();
+    }elseif(key == 101){
+        if(($algorithmChosen == 5) || ($algorithmChosen == 4) || ($algorithmChosen == 6)){
+            expansion();
+        }
+    }elseif(key == 114){
+        if(($algorithmChosen == 6) || ($algorithmChosen == 4) || ($algorithmChosen == 5)){
+            retraction();
+        }
+    }elseif(key == 32){
+        if($algorithmChosen == 1){
+            $algorithmChosen = -1
+        }elseif($algorithmChosen == -1){
+            $algorithmChosen = 1
+        }elseif($algorithmChosen == 7){
+
+            $algorithmChosen = -7
+        }elseif($algorithmChosen == -7){
+            $algorithmChosen = 7
+        }
+    }
+}
+
+# Get the app path...
+script_file = fsFullPath($argv[1]);
+script_path = fsPath(script_file);
+
+window = glwmCreateWindow("Network Visualization");
+
+if (!exists("window")) {
+    printf("Error: %s.\n", "creating window");
+    
+    exit(1);
+}
+
+function closeWindow(window) {
+    glwmExitMainLoop();
+}
+
+if(argc < 3){
+    println("Please inform algorithm! ");
+    println("Parameters: glwmguash VisualizationNetworks.gua -[algorithm] [filename.net]");
+    println("Algorithm for choice options [algorithm]:");
+    println("fruchterman - Force Direct Fruchterman algorithm");
+    println("circular - Circular Layout algorithm");
+    println("kcore - K-Core Layout algorithm");
+    println("random - Random Layout algorithm");
+    println("expansion - Expansion Layout algorithm");
+    println("retraction - Retraction Layout algorithm");
+    exit;
+}else{
+    if(argv[2] == "-circular"){
+        println("Algorithm chosen: Circular Layout");
+        $algorithmChosen = 2;
+        filename = argv[3];
+        println("Nome do Arquivo: "+filename+"\n");
+        result = cnaLoadFile(filename);
+        if(result == 0){
+            calculatePosition();
+        }
+    }elseif(argv[2] == "-kcore"){
+        println("Algorithm chosen: K-Core");
+        $algorithmChosen = 3;
+        filename = argv[3];
+        println("Nome do Arquivo: "+filename+"\n");
+        result = cnaLoadFile(filename);
+        if(result == 0){
+            calculatePositionKCore();
+        }
+    }elseif(argv[2] == "-random"){
+        println("Algorithm chosen: Random Layout");
+        $algorithmChosen = 4;
+        filename = argv[3];
+        println("Nome do Arquivo: "+filename+"\n");
+        result = cnaLoadFile(filename);
+        if(result == 0){
+            initRandom();
+        }
+    }elseif(argv[2] == "-expansion"){
+        println("Algorithm chosen: Expansion Layout");
+        $algorithmChosen = 5;
+        filename = argv[3];
+        println("Nome do Arquivo: "+filename+"\n");
+        result = cnaLoadFile(filename);
+        if(result == 0){
+            initExpansion();
+        }
+    }elseif(argv[2] == "-retraction"){
+        println("Algorithm chosen: Retraction Layout");
+        $algorithmChosen = 6;
+        filename = argv[3];
+        println("Nome do Arquivo: "+filename+"\n");
+        result = cnaLoadFile(filename);
+        if(result == 0){
+            initRetraction();
+        }
+    }elseif(argv[2] == "-fruchterman"){
+        println("Algorithm chosen: Fruchterman Reingold");
+        $algorithmChosen = 7;
+        filename = argv[3];
+        println("Nome do Arquivo: "+filename+"\n");
+        result = cnaLoadFile(filename);
+        if(result == 0){
+            initFruchterman();
+        }
+    }elseif(argv [2] == "-test"){
+        filename = argv[3];
+        println("Nome do Arquivo: "+filename);
+        finish = cnaLoadFile(filename);
+    }elseif(argv [2] == "-help"){
+        println("Please inform algorithm! ");
+        println("Parameters: glwmguash VisualizationNetworks.gua -[algorithm] [filename.net]");
+        println("Algorithm for choice options [algorithm]:");
+        println("fruchterman - Force Direct Fruchterman algorithm");
+        println("circular - Circular Layout algorithm");
+        println("kcore - K-Core Layout algorithm");
+        println("random - Random Layout algorithm");
+        println("expansion - Expansion Layout algorithm");
+        println("retraction - Retraction Layout algorithm");
+        exit(1);
+    }
+    glwmRegisterDisplayFunc(window, "display");
+    glwmRegisterMouseButtonPressFunc(window, "mouseButtonPress");
+    glwmRegisterMouseButtonReleaseFunc(window, "mouseButtonRelease");
+    glwmRegisterMouseMotionFunc(window, "mouseMotion");
+    glwmRegisterKeyPressFunc(window, "keyPress");
+    glwmRegisterCloseFunc(window, "closeWindow");
+
+    glwmSetWindowTitle(window, "Network Visualization");
+
+    glwmSetWindowPos(window, 100, 100);
+
+    glwmSetWindowSize(window, getWidthArea(), getHeightArea());
+
+
+    glwmMainLoop();
+
+    glwmDestroyWindow(window);
+
+    glwmTerminate();
+}
