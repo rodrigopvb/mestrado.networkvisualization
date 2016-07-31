@@ -33,3 +33,17 @@ Network20Vertex.net<br />
 Network100Vertex.net<br />
 Network500Vertex.net
 
+Features:
+
+- Move vertex: <br />
+    press the right mouse button for move vertex
+- Create dynamically edge in time of execution: <br/>
+    press the left mouse button in initial vertex and press the left mouse button in destination vertex
+- Information about network in console: <br/>
+    - Algorithm choice
+    - Filename 
+    - Number of vertex
+    - and more...
+- Stop algorithm based on force direct:<br/>
+    press the space bar
+
