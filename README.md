@@ -4,10 +4,10 @@ Software for Visualization Networks in GuaraScript
 
 How to execute application:
 
-1 - Download, build and install language GuaraScript<br />
+1 - Download, make and install language GuaraScript<br />
 link for download: https://github.com/guarascript/guash
 
-Follow instructions above for build and install:
+Follow instructions below for make and install:
 
 $make <br />
 $make install<br />
