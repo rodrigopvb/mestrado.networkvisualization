@@ -16,7 +16,7 @@ $make install_glwmguash
 
 2 - Download this repository<br />
 3 - In command line, execute:<br />
-$glwmguash VisualizationNetworks.gua -[algorithm] [filename]
+$./VisualizationNetworks.gua -[algorithm] [filename]
 
 Library algorithm<br />
 Name        | Description
