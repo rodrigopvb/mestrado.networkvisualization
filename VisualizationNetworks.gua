@@ -9,6 +9,7 @@ source("RetractionLayout.gua")
 source("FruchtermanReingold.gua")
 
 algorithmChosen = -1;
+cont = 0;
 
 function display(window){
     glClear(GL_COLOR_BUFFER_BIT);
@@ -26,7 +27,12 @@ function display(window){
     if($algorithmChosen == 1){
         execution();
     }elseif($algorithmChosen == 7){
+        tempoInicial = time();
+        $cont = $cont + 1;
         calculateForces();
+        tempoFinal = time()
+        tempoExecucao = tempoFinal - tempoInicial
+        println("Tempo de execução passagem "+ $cont +" : " + tempoExecucao)          
     }
 
     #Obtem posição dos vértices do eixo x e y
@@ -35,6 +41,8 @@ function display(window){
     
     edgeAxisX = getPositionsEdgesAxisX();
     edgeAxisY = getPositionsEdgesAxisY();
+    
+    namesVertices = getNameVertices();
 
     #define cor de fundo
     glClearColor(1.0,1.0,1.0,0.0);
@@ -54,6 +62,7 @@ function display(window){
         glBegin(GL_POINTS);
             glColor(1.0, 0.0, 0.0, 1.0);
             glVertex(vertexAxisX[i], vertexAxisY[i], 0);
+            #glfDrawText(vertexAxisX[i], vertexAxisY[i], getFilePath() + "/fonts/6x13.bdf", namesVertices[i])
         glEnd();
     }
     glFlush();
@@ -148,10 +157,6 @@ function keyPress(window, key, x, y) {
     }
 }
 
-# Get the app path...
-script_file = fsFullPath($argv[1]);
-script_path = fsPath(script_file);
-
 window = glwmCreateWindow("Network Visualization");
 
 if (!exists("window")) {
@@ -164,77 +169,58 @@ function closeWindow(window) {
     glwmExitMainLoop();
 }
 
-if(argc < 3){
-    println("Please inform algorithm! ");
-    println("Parameters: glwmguash VisualizationNetworks.gua -[algorithm] [filename.net]");
-    println("Algorithm for choice options [algorithm]:");
-    println("fruchterman - Force Direct Fruchterman algorithm");
-    println("circular - Circular Layout algorithm");
-    println("kcore - K-Core Layout algorithm");
-    println("random - Random Layout algorithm");
-    println("expansion - Expansion Layout algorithm");
-    println("retraction - Retraction Layout algorithm");
-    exit;
-}else{
-    if(argv[2] == "-circular"){
+function choiceAlgorithm(nameAlgorithm, fileName){
+    setPathFile(fsFullPath(fileName));
+    setFilePath(fsPath(getPathFile()));
+    result = cnaLoadFile(fileName);
+    println("Nome do Arquivo: "+fileName+"\n");
+    if(nameAlgorithm == "-circular"){
         println("Algorithm chosen: Circular Layout");
-        $algorithmChosen = 2;
-        filename = argv[3];
-        println("Nome do Arquivo: "+filename+"\n");
-        result = cnaLoadFile(filename);
+        $algorithmChosen = 2;        
         if(result == 0){
+            tempoInicial = time()
             calculatePosition();
+            tempoFinal = time()
+            tempoExecucao = tempoFinal - tempoInicial
+            println("Tempo de execução: " + tempoExecucao)
         }
-    }elseif(argv[2] == "-kcore"){
+    }elseif(nameAlgorithm == "-kcore"){
         println("Algorithm chosen: K-Core");
         $algorithmChosen = 3;
-        filename = argv[3];
-        println("Nome do Arquivo: "+filename+"\n");
-        result = cnaLoadFile(filename);
         if(result == 0){
+            tempoInicial = time()
             calculatePositionKCore();
+            tempoFinal = time()
+            tempoExecucao = tempoFinal - tempoInicial
+            println("Tempo de execução: " + tempoExecucao)            
         }
-    }elseif(argv[2] == "-random"){
+    }elseif(nameAlgorithm == "-random"){
         println("Algorithm chosen: Random Layout");
         $algorithmChosen = 4;
-        filename = argv[3];
-        println("Nome do Arquivo: "+filename+"\n");
-        result = cnaLoadFile(filename);
         if(result == 0){
             initRandom();
         }
-    }elseif(argv[2] == "-expansion"){
+    }elseif(nameAlgorithm == "-expansion"){
         println("Algorithm chosen: Expansion Layout");
         $algorithmChosen = 5;
-        filename = argv[3];
-        println("Nome do Arquivo: "+filename+"\n");
-        result = cnaLoadFile(filename);
         if(result == 0){
             initExpansion();
         }
-    }elseif(argv[2] == "-retraction"){
+    }elseif(nameAlgorithm == "-retraction"){
         println("Algorithm chosen: Retraction Layout");
         $algorithmChosen = 6;
-        filename = argv[3];
-        println("Nome do Arquivo: "+filename+"\n");
-        result = cnaLoadFile(filename);
         if(result == 0){
             initRetraction();
         }
-    }elseif(argv[2] == "-fruchterman"){
+    }elseif(nameAlgorithm == "-fruchterman"){
         println("Algorithm chosen: Fruchterman Reingold");
         $algorithmChosen = 7;
-        filename = argv[3];
-        println("Nome do Arquivo: "+filename+"\n");
-        result = cnaLoadFile(filename);
         if(result == 0){
             initFruchterman();
         }
-    }elseif(argv [2] == "-test"){
-        filename = argv[3];
+    }elseif(nameAlgorithm == "-test"){
         println("Nome do Arquivo: "+filename);
-        finish = cnaLoadFile(filename);
-    }elseif(argv [2] == "-help"){
+    }elseif(nameAlgorithm == "-help"){
         println("Please inform algorithm! ");
         println("Parameters: glwmguash VisualizationNetworks.gua -[algorithm] [filename.net]");
         println("Algorithm for choice options [algorithm]:");
@@ -265,4 +251,20 @@ if(argc < 3){
     glwmDestroyWindow(window);
 
     glwmTerminate();
+}
+
+
+if(argc < 3){
+    println("Please inform algorithm! ");
+    println("Parameters: glwmguash VisualizationNetworks.gua -[algorithm] [filename.net]");
+    println("Algorithm for choice options [algorithm]:");
+    println("fruchterman - Force Direct Fruchterman algorithm");
+    println("circular - Circular Layout algorithm");
+    println("kcore - K-Core Layout algorithm");
+    println("random - Random Layout algorithm");
+    println("expansion - Expansion Layout algorithm");
+    println("retraction - Retraction Layout algorithm");
+    exit;
+}else{
+    choiceAlgorithm(argv[2], argv[3]);
 }

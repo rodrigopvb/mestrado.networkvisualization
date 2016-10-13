@@ -4,6 +4,8 @@ yv = {0};
 xe = {0};
 ye = {0};
 
+nameVertices = {0}
+
 currentSelectedVertex = -1;
 
 validatorSelectedVertex = "false";
@@ -13,6 +15,10 @@ secondSelectedVertex = -1;
 
 widthArea = 800;
 heightArea = 600;
+
+# Get the app path...
+Networkfile = "";
+FilePath = "";
 
 function findVertice(valueX, valueY){
     
@@ -61,6 +67,22 @@ printf("vertice não encontrado\n");
 
 return (-1);
 
+}
+
+function setPathFile(file){
+    $Networkfile = file;
+}
+
+function getPathFile(){
+    return($Networkfile);
+}
+
+function setFilePath(filePath){
+    $FilePath = filePath;
+}
+
+function getFilePath(){
+    return($Networkfile);
 }
 
 function convertPositionAxisInPositionClickMouseX(x){
@@ -115,6 +137,10 @@ function getPositionsEdgesAxisX(){
 
 function getPositionsEdgesAxisY(){
     return($ye);
+}
+
+function getNameVertices(){
+    return($nameVertices);
 }
 
 function getEspecificPositionVertexAxisX(position){
@@ -306,11 +332,12 @@ function cnaLoadFile(file_name) {
         }
 
         if (file_section == "*vertices") {
-            adj[0, i + 1] = eval(record[1])
-            adj[i + 1, 0] = eval(record[1])
+            println(eval(record[1]));
+            $nameVertice[i] = eval(record[1]);             
             i = i + 1
         } elseif (file_section == "*edges") {
-            if (length(record) == 2) {
+            println(eval(record[0]) + " " + eval(record[1]))
+            if (length(record) >= 2) {
                 if(length($xe) == 1){
                     $xe[0] = (eval(record[0])) - 1;
                     $ye[0] = (eval(record[0])) - 1;
