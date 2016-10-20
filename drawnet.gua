@@ -16,7 +16,7 @@ function display(window){
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    
+        
     widthArea = getWidthArea();
     heightArea = getHeightArea();
     
@@ -191,24 +191,55 @@ function initializeVisualInterface(){
     glwmTerminate();
 }
 
-
-if(argc < 3){
-    println("Please inform algorithm! ");
-    println("Parameters: glwmguash VisualizationNetworks.gua -[algorithm] [filename.net]");
-    println("Algorithm for choice options [algorithm]:");
-    println("fruchterman - Force Direct Fruchterman algorithm");
-    println("circular - Circular Layout algorithm");
-    println("kcore - K-Core Layout algorithm");
-    println("random - Random Layout algorithm");
-    println("expansion - Expansion Layout algorithm");
-    println("retraction - Retraction Layout algorithm");
-    exit;
-}else{
-    choiceAlgorithm(argv[2], argv[3]);
-    initializeVisualInterface();        
-}
-
 function interfaceCommunication(nameAlgorithm, fileName){
     choiceAlgorithm(nameAlgorithm, fileName);
     initializeVisualInterface();        
 }
+
+input_file = "noname"
+algorithm = "circular"
+
+#
+# Main program.
+#
+if (argc < 3) {
+    println("Usage: visnet option1 value1 [option1 value1]")
+    exit
+}
+
+i = 2
+
+while (i < argc) {
+    if ((argv[i] == "-h") || (argv[i] == "--help")) {
+        println("Usage: visnet option1 value1 [option1 value1]")
+        println("-h    --help           show the options sumary")
+        println("-i                     input file")
+        println("      --fruchterman    Force Direct Fruchterman algorithm")
+        println("      --circular       Circular Layout algorithm")
+        println("      --kcore          K-Core Layout algorithm")
+        println("      --random         Random Layout algorithm")
+        println("      --expansion      Expansion Layout algorithm")
+        println("      --retraction     Retraction Layout algorithm")
+        exit(0)
+    } elseif (argv[i] == "-i") {
+        i = i + 1
+        input_file = argv[i]
+    } elseif (argv[i] == "--fruchterman") {
+        algorithm = "fruchterman"
+    } elseif (argv[i] == "--circular") {
+        algorithm = "circular"
+    } elseif (argv[i] == "--kcore") {
+        algorithm = "kcore"
+    } elseif (argv[i] == "--random") {
+        algorithm = "random"
+    } elseif (argv[i] == "--expansion") {
+        algorithm = "expansion"
+    } elseif (argv[i] == "--retraction") {
+        algorithm = "retraction"
+    }
+    i = i + 1
+}
+
+choiceAlgorithm(algorithm, input_file);
+initializeVisualInterface();        
+
