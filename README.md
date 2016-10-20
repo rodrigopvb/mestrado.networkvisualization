@@ -16,13 +16,14 @@ $make install_glwmguash
 
 2 - Download this repository<br />
 3 - In command line, execute:<br />
-$./VisualizationNetworks.gua -[algorithm] [filename]
+$./drawnet.gua -i [filename] --[algorithm]
 
 Library algorithm<br />
 Name        | Description
 
 fruchterman | Force Direct Fruchterman algorithm<br />
 circular    | Circular Layout algorithm<br />
+kcore       | K-core algorithm<br />
 random      | Random Layout algorithm<br />
 expansion   | Expansion Layout algorithm<br />
 retraction  | Retraction Layout algorithm<br />
