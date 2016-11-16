@@ -4,7 +4,7 @@ yv = {0};
 xe = {0};
 ye = {0};
 
-nameVertices = {0}
+$nameVertices = {""};
 
 currentSelectedVertex = -1;
 
@@ -141,6 +141,10 @@ function getPositionsEdgesAxisY(){
 
 function getNameVertices(){
     return($nameVertices);
+}
+
+function setNameVertices(names){
+    $nameVertices = names;
 }
 
 function getEspecificPositionVertexAxisX(position){
@@ -375,7 +379,7 @@ function cnaLoadFile(file_name) {
     currentVertice = -1;
     file_section = "none"
     x = 0;
-    y = 0;
+    y = 0;   
 
     while (!feof(fp)) {
         if((line = fgets(fp)) == NULL) { 
@@ -390,7 +394,7 @@ function cnaLoadFile(file_name) {
                 lengthVertices = eval(record[1]);
                 for (i = 0; i < lengthVertices; i = i + 1){
                     $xv[i] = 0;
-                    $yx[i] = 0;
+                    $yx[i] = 0;                    
                 }
             }
             i = 0
@@ -398,8 +402,8 @@ function cnaLoadFile(file_name) {
         }
 
         if (file_section == "*vertices") {
-            println(eval(record[1]));
-            $nameVertice[i] = eval(record[1]);             
+            $nameVertices[i] = eval(record[1]) + 1;
+            println($nameVertices[i])             
             i = i + 1
         } elseif (file_section == "*edges") {
             println(eval(record[0]) + " " + eval(record[1]))
@@ -434,7 +438,7 @@ function cnaLoadFile(file_name) {
             i = i + 1
         }
     }
-
+    setNameVertices(nameVertices)
     fp = fclose(fp)
     return(0)
 }

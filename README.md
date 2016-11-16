@@ -47,4 +47,9 @@ Features:
     - and more...
 - Stop algorithm based on force direct:<br/>
     press the space bar
-
+- Expanse algorithm:<br/>
+    press the key e 
+- Contraction algorithm:<br/>
+    press the key c
+- Display Label Vertice:<br/>
+    press the key l

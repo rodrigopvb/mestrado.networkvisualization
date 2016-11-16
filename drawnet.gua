@@ -10,6 +10,13 @@ source("FruchtermanReingold.gua")
 
 algorithmChosen = -1;
 cont = 0;
+rotate = 0;
+orientation = 0;
+label = 0;
+
+script_file = "";
+script_path = "";
+
 
 function display(window){
     glClear(GL_COLOR_BUFFER_BIT);
@@ -23,7 +30,8 @@ function display(window){
     glViewport(0, 0, widthArea, heightArea);
     glOrtho(0.0, 1.0, 1.0, 0.0, 1.0, -1.0);
     glMatrixMode(GL_MODELVIEW);
-    
+
+   
     if($algorithmChosen == 1){
         execution();
     }elseif($algorithmChosen == 7){
@@ -43,6 +51,7 @@ function display(window){
     edgeAxisY = getPositionsEdgesAxisY();
     
     namesVertices = getNameVertices();
+  
 
     #define cor de fundo
     glClearColor(1.0,1.0,1.0,0.0);
@@ -61,17 +70,25 @@ function display(window){
     for(i=0; i<length(vertexAxisX); i=i+1){
         glBegin(GL_POINTS);
             glColor(1.0, 0.0, 0.0, 1.0);
-            glVertex(vertexAxisX[i], vertexAxisY[i], 0);
-            #glfDrawText(vertexAxisX[i], vertexAxisY[i], getFilePath() + "/fonts/6x13.bdf", namesVertices[i])
+            glVertex(vertexAxisX[i], vertexAxisY[i], 0);            
         glEnd();
+        if($label == 1){
+            glColor(0.0, 0.0, 0.0, 1.0);
+            glfDrawText(vertexAxisX[i] + 0.010, vertexAxisY[i] + 0.012, $script_path + "/fonts/6x13.bdf", namesVertices[i]);
+        }
     }
+    
+    glBegin(GL_LINES);
+        glColor(0.0, 0.0, 0.0, 1.0);
+            glVertex(1, 0, 0);
+            glVertex(1, 1, 0);
+    glEnd();
     glFlush();
     
-    #glwmSwapBuffers(window);
+    glwmSwapBuffers(window);
 }
 
 function mouseMotion(window, x, y) {
-
     currentPosition = getCurrentSelectedVertex();
     if(currentPosition == -1){
     }else{
@@ -139,7 +156,7 @@ function keyPress(window, key, x, y) {
         if(($algorithmChosen == 5) || ($algorithmChosen == 4) || ($algorithmChosen == 6)){
             expansion();
         }
-    }elseif(key == 114){
+    }elseif(key == 99){
         if(($algorithmChosen == 6) || ($algorithmChosen == 4) || ($algorithmChosen == 5)){
             retraction();
         }
@@ -154,6 +171,18 @@ function keyPress(window, key, x, y) {
         }elseif($algorithmChosen == -7){
             $algorithmChosen = 7
         }
+    }elseif(key == 108){
+        if($label == 0){
+            $label = 1;
+        }else{
+            $label = 0;
+        }
+    }elseif(key == 120){
+        $rotate = 1;
+        $orientation = 1;
+    }elseif(key == 121){
+        $rotate = 1;
+        $orientation = 2;
     }
 }
 
@@ -177,12 +206,11 @@ function initializeVisualInterface(){
     glwmRegisterKeyPressFunc(window, "keyPress");
     glwmRegisterCloseFunc(window, "closeWindow");
 
-    glwmSetWindowTitle(window, "Network Visualization");
+    glwmSetWindowTitle(window, "DrawNet");
 
     glwmSetWindowPos(window, 100, 100);
 
     glwmSetWindowSize(window, getWidthArea(), getHeightArea());
-
 
     glwmMainLoop();
 
@@ -193,7 +221,9 @@ function initializeVisualInterface(){
 
 function interfaceCommunication(nameAlgorithm, fileName){
     choiceAlgorithm(nameAlgorithm, fileName);
-    initializeVisualInterface();        
+    initializeVisualInterface();
+
+    initializeVisualInterfaceHelp($script_path);        
 }
 
 input_file = "noname"
@@ -224,6 +254,7 @@ while (i < argc) {
     } elseif (argv[i] == "-i") {
         i = i + 1
         input_file = argv[i]
+        $script_file = fsFullPath($argv[1]);        
     } elseif (argv[i] == "--fruchterman") {
         algorithm = "fruchterman"
     } elseif (argv[i] == "--circular") {
@@ -238,8 +269,12 @@ while (i < argc) {
         algorithm = "retraction"
     }
     i = i + 1
+    # Get the app path...
+    $script_path = fsPath($script_file);
+    println("Script path: " + $script_path)
 }
+
+t1 = glwmGetTime();
 
 choiceAlgorithm(algorithm, input_file);
 initializeVisualInterface();        
-
