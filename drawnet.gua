@@ -1,6 +1,6 @@
 #!/usr/local/bin/glwmguash
 
-source("LibVisualizationNetworks.gua")
+source("DrawNetController.gua")
 source("CircularLayout.gua")
 source("KcoreLayout.gua")
 source("RandomLayout.gua")
