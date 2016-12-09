@@ -1,4 +1,4 @@
-source("LibVisualizationNetworks.gua")
+source("DrawNetController.gua")
 
 startAngle = 0.0;
 endAngle = PI * 2;

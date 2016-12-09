@@ -1,4 +1,4 @@
-source("LibVisualizationNetworks.gua")
+source("DrawNetController.gua")
 
 posXv = {0};
 posYv = {0};

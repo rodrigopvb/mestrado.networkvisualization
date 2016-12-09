@@ -4,7 +4,9 @@ yv = {0};
 xe = {0};
 ye = {0};
 
-$nameVertices = {""};
+nameVertices = {""};
+positionNameX = {0};
+positionNameY = {0};
 
 currentSelectedVertex = -1;
 
@@ -21,6 +23,55 @@ Networkfile = "";
 FilePath = "";
 
 function findVertice(valueX, valueY){
+    
+    x = convertPositionAxisInPositionClickMouseX(valueX);
+    y = convertPositionAxisInPositionClickMouseY(valueY);
+    
+    println("Valor Convertido de X: "+ x);
+    println("Valor Convertido de Y: "+ y);
+    
+    for(i=0; i< length($xv); i=i+1){
+        if(x == $xv[i]){
+            if(y == $yv[i]){
+                println("vertice = "+ $xv[1] + "encontrado");
+                return (i);
+            }else{
+                for(j=-0.008; j<0.008; j=j+0.001){
+                    if(y == $yv[i]+j){
+                        println("vertice = "+ $xv[1] + "encontrado");
+                        return (i);
+                    }
+                }
+            }
+            
+        }else{
+            for(j=-0.008; j<0.008; j=j+0.001){
+                if(x == ($xv[i]+j)){
+                println("Achei o x na posição: " + i);
+                    if(y == $yv[i]){
+                        println("vertice = "+ $xv[1] + "encontrado");
+                        return (i);
+                    }else{
+                        for(m=-0.008; m<0.008; m=m+0.001){
+                            if(y == ($yv[i]+m)){
+                                println("vertice = "+ $xv[1] + "encontrado");
+                                return (i);
+                            }
+                        }
+                    
+                    }
+                }
+            }
+        }
+    }
+    
+printf("vertice não encontrado\n");
+
+return (-1);
+
+}
+
+function findLabelVertice(valueX, valueY){
     
     x = convertPositionAxisInPositionClickMouseX(valueX);
     y = convertPositionAxisInPositionClickMouseY(valueY);
@@ -123,6 +174,14 @@ function convertValueNormalized(value){
     return(finalValue);
 }
 
+function getWidthArea(){
+    return($widthArea);
+}
+
+function getHeightArea(){
+    return($heightArea);
+}
+
 function getPositionsVertexAxisX(){
     return($xv);
 }
@@ -155,20 +214,28 @@ function setEspecificValueInPositionVertexAxisX(position, value){
     $xv[position] = value;
 }
 
-function getWidthArea(){
-    return($widthArea);
-}
-
-function getHeightArea(){
-    return($heightArea);
-}
-
 function getEspecificPositionVertexAxisY(position){
     return($yv[position]);
 }
 
 function setEspecificValueInPositionVertexAxisY(position, value){
     $yv[position] = value;
+}
+
+function getEspecificPositionNameVertexAxisX(position){
+    return($positionNameX[position]);
+}
+
+function setEspecificValueInPositionNameVertexAxisX(position, value){
+    $positionNameX[position] = value;
+}
+
+function getEspecificPositionNameVertexAxisY(position){
+    return($positionNameY[position]);
+}
+
+function setEspecificValueInPositionNameVertexAxisY(position, value){
+    $positionNameY[position] = value;
 }
 
 function getEspecificPositionEdgeAxisX(position){
